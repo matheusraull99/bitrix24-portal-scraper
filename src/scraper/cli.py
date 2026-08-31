@@ -54,7 +54,7 @@ def valor_br(bruto: str) -> Decimal:
     try:
         return Decimal(limpo or "0")
     except InvalidOperation:
-        return Decimal("0")
+        return Decimal(0)
 
 
 def main(argv: list[str] | None = None) -> int:

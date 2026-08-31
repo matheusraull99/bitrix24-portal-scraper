@@ -6,6 +6,8 @@ a parte que decide *se dá para confiar* no que o navegador trouxe.
 
 from __future__ import annotations
 
+from typing import ClassVar
+
 import pytest
 
 from scraper.seletores import (
@@ -31,7 +33,7 @@ class TestAlvo:
 
     def test_monta_o_seletor_certo_por_tipo(self):
         a = alvo("x", testid="btn", id="campo", rotulo="Buscar", texto="Ir", css=".classe")
-        seletores = dict((e.name, s) for e, s in a.ordenadas())
+        seletores = {e.name: s for e, s in a.ordenadas()}
         assert seletores["ATRIBUTO_DE_TESTE"] == '[data-testid="btn"]'
         assert seletores["ID"] == "#campo"
         assert seletores["ROTULO"] == '[aria-label="Buscar"]'
@@ -71,8 +73,14 @@ class TestNormalizarCabecalho:
 
 
 class TestCasarColunas:
-    CABECALHO = ["Nº Pedido", "Cliente", "Data de Emissão", "Valor Total", "Situação"]
-    DESEJADAS = {
+    CABECALHO: ClassVar[list[str]] = [
+        "Nº Pedido",
+        "Cliente",
+        "Data de Emissão",
+        "Valor Total",
+        "Situação",
+    ]
+    DESEJADAS: ClassVar[dict[str, tuple[str, ...]]] = {
         "numero": ("Nº Pedido", "Numero do Pedido"),
         "cliente": ("Cliente",),
         "valor": ("Valor Total", "Total"),
@@ -99,8 +107,12 @@ class TestCasarColunas:
 
 
 class TestExtrairLinhas:
-    CABECALHO = ["Nº Pedido", "Cliente", "Valor Total"]
-    DESEJADAS = {"numero": ("Nº Pedido",), "cliente": ("Cliente",), "valor": ("Valor Total",)}
+    CABECALHO: ClassVar[list[str]] = ["Nº Pedido", "Cliente", "Valor Total"]
+    DESEJADAS: ClassVar[dict[str, tuple[str, ...]]] = {
+        "numero": ("Nº Pedido",),
+        "cliente": ("Cliente",),
+        "valor": ("Valor Total",),
+    }
 
     def test_converte_linhas_em_registros(self):
         linhas = [["1001", "Aurora", "8.500,00"], ["1002", "Delta", "3.200,00"]]

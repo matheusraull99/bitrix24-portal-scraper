@@ -3,3 +3,7 @@ playwright>=1.45
 
 # Cliente base da serie (projeto 01)
 bitrix24-client @ git+https://github.com/matheusraull99/bitrix24-rest-client.git@v1.0.0
+
+# zoneinfo usa a base IANA do sistema; o Windows nao tem uma, entao la o
+# tzdata precisa vir do PyPI. No Linux do CI a marca deixa a linha inerte.
+tzdata>=2024.1; sys_platform == "win32"

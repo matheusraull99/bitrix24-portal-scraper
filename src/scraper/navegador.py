@@ -20,11 +20,14 @@ import json
 import logging
 from contextlib import contextmanager
 from dataclasses import dataclass
-from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from .seletores import Alvo, Ancora, extrair_linhas
+from .tempo import agora
+
+if TYPE_CHECKING:  # `Self` so existe em typing a partir do 3.11, e o piso aqui e 3.10.
+    from typing_extensions import Self
 
 log = logging.getLogger("scraper")
 
@@ -58,7 +61,7 @@ class Portal:
         self._context = None
         self.page = None
 
-    def __enter__(self) -> Portal:
+    def __enter__(self) -> Self:
         from playwright.sync_api import sync_playwright
 
         self._playwright = sync_playwright().start()
@@ -159,13 +162,14 @@ class Portal:
     def guardar_prova(self, rotulo: str) -> Path:
         """Salva print e HTML para depuração posterior."""
         self.config.provas.mkdir(parents=True, exist_ok=True)
-        carimbo = datetime.now().strftime("%Y%m%d-%H%M%S")
+        carimbo = agora().strftime("%Y%m%d-%H%M%S")
         base = self.config.provas / f"{carimbo}_{rotulo}"
         try:
             self.page.screenshot(path=f"{base}.png", full_page=True)
             base.with_suffix(".html").write_text(self.page.content(), encoding="utf-8")
             log.error("prova salva em %s.png", base)
-        except Exception:  # noqa: BLE001 - salvar prova nunca pode mascarar o erro real
+        except Exception:
+            # Captura ampla de proposito: salvar prova nunca pode mascarar o erro real.
             log.exception("nao consegui salvar a prova")
         return base
 
